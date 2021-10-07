@@ -23,7 +23,34 @@
     <div class="container">
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane show active" id="pills-articles" role="tabpanel" aria-labelledby="pills-articles-tab">
-                게시글
+                <!-- 이미지
+                등록일자
+                주소 (동까지)
+                처리상태 (접수/처리중/처리완료) -->
+
+                <div class="row">
+                    <div class="card">
+                        <div class="card-img-top">
+                            <div class="thumbnail thumbnail-before"><img src="../images/example/news1.jpg"></div>
+                            <div class="thumbnail thumbnail-after"><img src="../images/example/news2.jpg"></div>    
+                        </div>
+                        <div class="like clear py-2">
+                            <div class="button active">
+                                <img class="like" src="../images/favorite.svg">
+                                <img class="none" src="../images/favorite_border.svg">
+                            </div>
+                            <div class="float-right">
+                                좋아요<span class="count">6</span>
+                            </div>
+                        </div>
+                        <div class="content pb-2">누가 양심없게 몰래 쓰레기를 버리고 갔어요 ㅠㅠ</div>
+                        <div class="info pb-1">
+                            <div class="status status1">접수</div>
+                            <div class="address">서구 관저동</div>
+                            <div class="created-at">2021-09-29</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -47,9 +74,9 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a href="./analytics.html" class="nav-link" id="pills-analytics-tab">
+                <a href="./news.html" class="nav-link" id="pills-news-tab">
                     <img src="/images/insert_chart_black_48dp.svg" class="black">
-                    통계
+                    뉴스
                 </a>
             </li>
         </ul>

@@ -3,6 +3,7 @@
 html, body {
     height: 100%;
     font-family: 'Noto Sans KR', sans-serif;
+    overflow: hidden;
 }
 
 body > .container {
@@ -12,6 +13,18 @@ body > .container {
 
 .overflow-y-auto {
     overflow-y: auto;
+}
+
+.float-right {
+    float: right;
+}
+
+.float-left {
+    float: left;
+}
+
+.clear {
+    clear: both;
 }
 
 .tabs {
@@ -30,7 +43,7 @@ body > .container {
 .tabs .nav-item .nav-link {
     width: 100%;
     text-align: center;
-    color: #000000;
+    color: #212529;
     border-radius: 0;
 }
 
@@ -122,5 +135,106 @@ body > .container {
 .section-location .location {
     text-decoration: underline;
     cursor: pointer;
+    color: #a9a9a9;
+}
+
+#pills-news .row {
+    position: relative;
+    padding: 8px 16px;
+    border-bottom: 1px solid #a9a9a9;
+}
+
+#pills-news .row a {
+    color: #212529;
+    text-decoration: none;
+}
+
+#pills-news .row .thumbnail img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border: 1px solid #a9a9a9;
+    border-radius: 8px;
+}
+
+#pills-news .row .created-at {
+    position: absolute;
+    width: calc(100% - 120px);
+    bottom: 6px;
+    right: 18px;
+    font-size: 13px;
+    color: #a9a9a9;
+}
+
+#pills-news .row .title {
+    position: absolute;
+    width: calc(100% - 120px);
+    top: 6px;
+    right: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+#pills-articles .row {
+    position: relative;
+    padding: 8px 16px;
+}
+
+#pills-articles .like .button {
+    display: inline-block;
+}
+
+#pills-articles .like .button .none,
+#pills-articles .like .button.active .like {
+    display: block;
+}
+
+#pills-articles .like .button .like,
+#pills-articles .like .button.active .none {
+    display: none;
+}
+
+#pills-articles .like .button img {
+    width: 36px;
+}
+
+#pills-articles .info > div { 
+    display: inline-block;
+    margin-right: 4px;
+}
+
+#pills-articles .info .status1 {
+    color: #ff3838;
+}
+
+#pills-articles .info .status2 {
+    color: #ffb302;
+}
+
+#pills-articles .info .status3 {
+    color: #56f000;
+}
+
+#pills-articles .row .thumbnail {
+    display: inline;
+}
+
+#pills-articles .row .thumbnail-before {
+    margin-right: -4px;
+}
+
+#pills-articles .row .thumbnail img {
+    width: 50%;
+    height: 250px;
+    object-fit: cover;
+    border: 1px solid #a9a9a9;
+    border-radius: 8px;
+}
+
+#pills-articles .row .created-at {
+    font-size: 13px;
     color: #a9a9a9;
 }
