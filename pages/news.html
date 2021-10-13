@@ -15,21 +15,53 @@
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
         crossorigin="anonymous"></script>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
     <script type="text/javascript"
         src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uxdaz0sqo9"></script>
+
+    <script>
+        $().ready(function () {
+            var panel = $('#pills-news')
+
+            var dataSet = [
+                {
+                    link: 'https://moneys.mt.co.kr/news/mwView.php?no=2021092817468050550',
+                    title: "'플로깅'을 아시나요?... 쓰레기도 줍고 건강도 챙기는 '착한 달리기'",
+                    thumbnail: '../images/example/news1.jpg',
+                    createdAt: '2021-09-29'
+                },
+                {
+                    link: 'https://www.joongang.co.kr/article/25009318',
+                    title: "담배꽁초 수거하면 보상금 6만원…길거리 애물단지의 변신",
+                    thumbnail: '../images/example/news3.jpg',
+                    createdAt: '2021-10-08'
+                }
+            ];
+
+            dataSet.forEach(function (data) {
+                panel.append(applyTemplate(data));
+            })
+        })
+
+        function applyTemplate(data) {
+            return `<div class="row">`
+                + `<a href="${data.link}" target="_blank">`
+                + `<div class="title">${data.title}</div>`
+                + `<div class="thumbnail"><img src="${data.thumbnail}"></div>`
+                + `<div class="created-at">${data.createdAt}</div>`
+                + `</a>`
+                + `</div>`
+        }
+    </script>
 </head>
 
 <body>
     <div class="container">
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane show active" id="pills-news" role="tabpanel" aria-labelledby="pills-news-tab">
-                <div class="row">
-                    <a href="https://moneys.mt.co.kr/news/mwView.php?no=2021092817468050550" target="_blank">
-                        <div class="title">'플로깅'을 아시나요?... 쓰레기도 줍고 건강도 챙기는 '착한 달리기'</div>
-                        <div class="thumbnail"><img src="../images/example/news1.jpg"></div>
-                        <div class="created-at">2021-09-29</div>
-                    </a>
-                </div>
+                <!-- 동적으로 추가 되는 부분 -->
             </div>
         </div>
 

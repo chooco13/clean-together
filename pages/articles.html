@@ -15,42 +15,93 @@
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
         crossorigin="anonymous"></script>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
     <script type="text/javascript"
         src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uxdaz0sqo9"></script>
+
+    <script>
+        $().ready(function () {
+            var panel = $('#pills-articles');
+
+            var dataSet = [
+                {
+                    "thumbnail-before": '../images/example/news1.jpg',
+                    "thumbnail-after": '../images/example/news2.jpg',
+                    content: '누가 양심없게 몰래 쓰레기를 버리고 갔어요 ㅠㅠ',
+                    address: '서구 관저동',
+                    createdAt: '2021-09-29',
+                    like: 6,
+                    status: 1 // 접수
+                },
+                {
+                    "thumbnail-before": '../images/example/news2.jpg',
+                    "thumbnail-after": '../images/example/news3.jpg',
+                    content: '누구냐 ㅠㅠ',
+                    address: '서구 둔산동',
+                    createdAt: '2021-10-08',
+                    like: 100,
+                    status: 2 // 처리중
+                }
+            ];
+
+            dataSet.forEach(function(data) {
+                panel.append(applyTemplate(data));
+            })
+        })
+
+        function applyTemplate(data) {
+            return `<div class="row">`
+            + `    <div class="card">`
+            + `        <div class="card-img-top">`
+            + `            <div class="thumbnail thumbnail-before"><img src="${data["thumbnail-before"]}"></div>`
+            + `            <div class="thumbnail thumbnail-after"><img src="${data["thumbnail-after"]}"></div>`
+            + `        </div>`
+            + `        <div class="like clear py-2">`
+            + `            <div class="button active">`
+            + `                <img class="like" src="../images/favorite.svg">`
+            + `                <img class="none" src="../images/favorite_border.svg">`
+            + `            </div>`
+            + `            <div class="float-right">`
+            + `                좋아요<span class="count">${data.like}</span>`
+            + `            </div>`
+            + `        </div>`
+            + `        <div class="content pb-2">${data.content}</div>`
+            + `        <div class="info pb-1">`
+            + `            <div class="status status${data.status}">${getStatusLabel(data.status)}</div>`
+            + `            <div class="address">${data.address}</div>`
+            + `            <div class="created-at">${data.createdAt}</div>`
+            + `        </div>`
+            + `    </div>`
+            + `</div>`
+        }
+
+        function getStatusLabel(status) {
+            var label = ''
+            
+            switch (status) {
+                case 1:
+                    label = '접수';
+                    break;
+                case 2:
+                    label = '처리중';
+                    break;
+                case 3:
+                    label = '완료';
+                    break;
+            }
+            
+            return label;
+        }
+    </script>
 </head>
 
 <body>
     <div class="container">
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane show active" id="pills-articles" role="tabpanel" aria-labelledby="pills-articles-tab">
-                <!-- 이미지
-                등록일자
-                주소 (동까지)
-                처리상태 (접수/처리중/처리완료) -->
-
-                <div class="row">
-                    <div class="card">
-                        <div class="card-img-top">
-                            <div class="thumbnail thumbnail-before"><img src="../images/example/news1.jpg"></div>
-                            <div class="thumbnail thumbnail-after"><img src="../images/example/news2.jpg"></div>    
-                        </div>
-                        <div class="like clear py-2">
-                            <div class="button active">
-                                <img class="like" src="../images/favorite.svg">
-                                <img class="none" src="../images/favorite_border.svg">
-                            </div>
-                            <div class="float-right">
-                                좋아요<span class="count">6</span>
-                            </div>
-                        </div>
-                        <div class="content pb-2">누가 양심없게 몰래 쓰레기를 버리고 갔어요 ㅠㅠ</div>
-                        <div class="info pb-1">
-                            <div class="status status1">접수</div>
-                            <div class="address">서구 관저동</div>
-                            <div class="created-at">2021-09-29</div>
-                        </div>
-                    </div>
-                </div>
+                <!-- 동적으로 추가 되는 부분 -->
             </div>
         </div>
 
