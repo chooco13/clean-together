@@ -25,6 +25,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
+        const isAdmin = localStorage.getItem('admin') !== null;
+        const _likes = localStorage.getItem('likes', '');
+        const likes = _likes !== '' ? JSON.parse(_likes) : [];
+
         $().ready(function () {
             var panel = $('#pills-articles');
 
@@ -52,20 +56,32 @@
             var articleListRef = db.ref('articles');
             articleListRef.once('value', (snapshot) => {
                 snapshot.forEach((childSnapshot) => {
-                    panel.append(applyTemplate(childSnapshot.key, childSnapshot.val()));
+                    panel.prepend(applyTemplate(childSnapshot.key, childSnapshot.val()));
                 });
             });
 
-            $(document).on("click",".row .like .button",function() {
+            $(document).on("click", ".row .like .button", function () {
                 console.log('like');
                 console.log($(this).closest('.row').data('key'));
 
                 var row = $(this).closest('.row');
                 var key = row.data('key');
 
-                articleListRef.child(key).set({
-                    count: parseInt(row.find('.count').text()) + 1
-                })
+                var current = parseInt(row.find('.count').text())
+                var next;
+                if (likes.includes(key)) {
+                    next = current - 1;
+                    row.find('.button').removeClass('active');
+                    likes.splice(likes.indexOf(key), 1);
+                } else {
+                    next = current + 1;
+                    row.find('.button').addClass('active');
+                    likes.push(key);
+                }
+                localStorage.setItem('likes', JSON.stringify(likes));
+
+                articleListRef.child(`${key}/like`).set(next)
+                row.find('.count').text(next);
             });
         })
 
@@ -76,13 +92,11 @@
                 + `            <div class="thumbnail thumbnail-before"><img src="${data["thumbnail-before"]}"></div>`
                 + `            <div class="thumbnail thumbnail-after"><img src="${data["thumbnail-after"] === '' ? '../images/waiting.png' : data["thumbnail-after"]}"></div>`
                 + `        </div>`
-                + `        <div class="like clear py-2">`
-                + `            <div class="button active">`
+                + `        <div class="like py-2">`
+                + `            <div class="button${likes.includes(key) ? ' active' : ''}">`
                 + `                <img class="like" src="../images/favorite.svg">`
                 + `                <img class="none" src="../images/favorite_border.svg">`
-                + `            </div>`
-                + `            <div class="float-right">`
-                + `                좋아요<span class="count">${data.like}</span>`
+                + `                <span class="count">${data.like}</span>`
                 + `            </div>`
                 + `        </div>`
                 + `        <div class="content pb-2">${data.content}</div>`
@@ -91,6 +105,7 @@
                 + `            <div class="address">${data.address}</div>`
                 + `            <div class="created-at">${data.createdAt}</div>`
                 + `        </div>`
+                + (isAdmin ? `<div class="admin pb-1 text-right"><a href="./article-update.html?key=${key}">업데이트</a></div>` : '')
                 + `    </div>`
                 + `</div>`
         }

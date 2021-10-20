@@ -215,7 +215,7 @@ body > .container {
 
 #pills-articles .like .button .none,
 #pills-articles .like .button.active .like {
-    display: block;
+    display: inline-block;
 }
 
 #pills-articles .like .button .like,

@@ -23,6 +23,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
     <script>
         $().ready(function () {
@@ -46,26 +47,44 @@
             // Initialize Firebase
             const app = firebase.initializeApp(firebaseConfig);
             const db = app.database()
-            
-            $('#publish-button').click(function(){
+            const storage = app.storage()
+
+            $('#publish-button').click(function () {
                 console.log('click!');
                 console.log($('#link').val());
                 console.log($('#title').val());
+                console.log($('#file-input').val());
 
-                var newsListRef = db.ref('news');
-                var newPostRef = newsListRef.push();
-                newPostRef.set({
-                    link: $('#link').val(),
-                    title: $('#title').val(),
-                    thumbnail: '',
-                    createdAt: new Date().toISOString().slice(0, 10),
-                });
+                if ($('#file-input').val()) {
+                    var file = $('#file-input')[0].files[0]; // use the Blob or File API
+                    var newFilename = uuidv4() + '.jpg';
 
-                setTimeout(function() {
-                    location.href = "./news.html"
-                }, 2000)
+                    storageRef = storage.ref();
+                    storageRef.child(newFilename).put(file).then(function (snapshot) {
+                        snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                            var newsListRef = db.ref('news');
+                            var newPostRef = newsListRef.push();
+                            newPostRef.set({
+                                link: $('#link').val(),
+                                title: $('#title').val(),
+                                thumbnail: downloadURL,
+                                createdAt: new Date().toISOString().slice(0, 10),
+                            });
+
+                            setTimeout(function () {
+                                location.href = "./news.html"
+                            }, 2000)
+                        });
+                    });
+                }
             })
         })
+
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
     </script>
 </head>
 
@@ -75,7 +94,7 @@
             <div class="tab-pane show active" id="pills-news" role="tabpanel" aria-labelledby="pills-news-tab">
                 <input id="link" type="text" class="form-control" placeholder="링크">
                 <input id="title" type="text" class="form-control" placeholder="제목">
-                <input type="file" class="form-control">
+                <input id="file-input" type="file" class="form-control">
                 <button id="publish-button" class="btn btn-primary">등록</button>
             </div>
         </div>
@@ -100,8 +119,8 @@
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a href="#" class="nav-link active" id="pills-news-tab">
-                    <img src="/images/insert_chart_white_48dp.svg" class="white">
+                <a href="#" class="nav-link" id="pills-news-tab">
+                    <img src="/images/insert_chart_black_48dp.svg" class="black">
                     뉴스
                 </a>
             </li>
