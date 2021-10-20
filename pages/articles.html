@@ -25,9 +25,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        const isAdmin = localStorage.getItem('admin') !== null;
-        const _likes = localStorage.getItem('likes', '');
-        const likes = _likes !== '' ? JSON.parse(_likes) : [];
+        const isAdmin = sessionStorage.getItem('admin') !== null;
+        const _likes = localStorage.getItem('likes');
+        const likes = _likes !== null ? JSON.parse(_likes) : [];
 
         $().ready(function () {
             var panel = $('#pills-articles');
