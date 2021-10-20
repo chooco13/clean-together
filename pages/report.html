@@ -33,6 +33,7 @@
     <script>
         var lat = 0;
         var lng = 0;
+        var imageURL = '';
 
         window.addEventListener('DOMContentLoaded', (event) => {
             if (navigator.geolocation) {
@@ -134,10 +135,15 @@
                     return;
                 }
 
+                if (imageURL === '') {
+                    alert('이미지를 등록해주세요.')
+                    return;
+                }
+
                 var postListRef = db.ref('articles');
                 var newPostRef = postListRef.push();
                 newPostRef.set({
-                    "thumbnail-before": '',
+                    "thumbnail-before": imageURL,
                     "thumbnail-after": '',
                     content: $('#content').val(),
                     address: $('.section-location .location').text(),
@@ -155,16 +161,29 @@
 
             $('#file-input').change(function () {  
                 var file = $('#file-input')[0].files[0]; // use the Blob or File API
-                console.log(file);
-                console.log(uuidv4());
                 var newFilename = uuidv4() + '.jpg';
 
                 storageRef = storage.ref();
                 storageRef.child(newFilename).put(file).then(function(snapshot) {
                     snapshot.ref.getDownloadURL().then(function(downloadURL) {
                         console.log(downloadURL);
+                        imageURL = downloadURL;
+
+                        $('.section-image .thumbnail').removeClass('d-none')
+                        $('.section-image .upload-button').addClass('d-none')
+
+                        $('.section-image .thumbnail img').attr('src', downloadURL)
+
+                        $('#file-input').val(null);
                     });
                 });
+            })
+
+            $('.section-image .thumbnail .close').click(function() {
+                imageURL = '';
+
+                $('.section-image .thumbnail').addClass('d-none');
+                $('.section-image .upload-button').removeClass('d-none');
             })
         })
 
@@ -184,6 +203,10 @@
                     <!-- 이미지 올리는 곳 -->
                     <div class="upload-button">
                         <img src="/images/add_a_photo_black_48dp.svg" class="black">
+                    </div>
+                    <div class="thumbnail d-none">
+                        <img src="">
+                        <div class="close">x</div>
                     </div>
                     <input class="d-none" type="file" id="file-input">
                 </div>

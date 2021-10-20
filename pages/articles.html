@@ -74,7 +74,7 @@
                 + `    <div class="card">`
                 + `        <div class="card-img-top">`
                 + `            <div class="thumbnail thumbnail-before"><img src="${data["thumbnail-before"]}"></div>`
-                + `            <div class="thumbnail thumbnail-after"><img src="${data["thumbnail-after"]}"></div>`
+                + `            <div class="thumbnail thumbnail-after"><img src="${data["thumbnail-after"] === '' ? '../images/waiting.png' : data["thumbnail-after"]}"></div>`
                 + `        </div>`
                 + `        <div class="like clear py-2">`
                 + `            <div class="button active">`

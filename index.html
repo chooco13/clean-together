@@ -15,8 +15,38 @@
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
         crossorigin="anonymous"></script>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
     <script type="text/javascript"
         src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uxdaz0sqo9"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        $().ready(function () {
+
+        })
+
+        function getStatusLabel(status) {
+            var label = ''
+
+            switch (status) {
+                case 1:
+                    label = '접수';
+                    break;
+                case 2:
+                    label = '처리중';
+                    break;
+                case 3:
+                    label = '완료';
+                    break;
+            }
+
+            return label;
+        }
+    </script>
 </head>
 
 <body>
@@ -57,7 +87,7 @@
 
     <script>
         var mapOptions = {
-            center: new naver.maps.LatLng(37.3595704, 127.105399),
+            center: new naver.maps.LatLng(36.3504119, 127.3845475),
             zoom: 16
         };
 
@@ -99,12 +129,37 @@
                 infowindow.setContent('<div style="padding:20px;"><h5 style="margin-bottom:5px;color:#f00;">Geolocation not supported</h5></div>');
                 infowindow.open(map, center);
             }
-        });
 
-        naver.maps.Event.addListener(map, 'click', function (e) {
-            var marker = new naver.maps.Marker({
-                position: e.coord,
-                map: map
+            // Your web app's Firebase configuration
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            const firebaseConfig = {
+                apiKey: "AIzaSyDKn58QyDMdcfy68EOMON38O_M5Z0N9-pU",
+                authDomain: "clean-together-2021.firebaseapp.com",
+                databaseURL: "https://clean-together-2021-default-rtdb.firebaseio.com",
+                projectId: "clean-together-2021",
+                storageBucket: "clean-together-2021.appspot.com",
+                messagingSenderId: "299538432144",
+                appId: "1:299538432144:web:23c34e489c71aeb8509815",
+                measurementId: "G-PJWLYC29GZ"
+            };
+
+            // Import the functions you need from the SDKs you need
+            // TODO: Add SDKs for Firebase products that you want to use
+            // https://firebase.google.com/docs/web/setup#available-libraries
+
+            // Initialize Firebase
+            const app = firebase.initializeApp(firebaseConfig);
+            const db = app.database()
+
+            var articleListRef = db.ref('articles');
+            articleListRef.once('value', (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    var report = childSnapshot.val();
+                    var marker = new naver.maps.Marker({
+                        position: new naver.maps.LatLng(report.lat, report.lng),
+                        map: map
+                    });
+                });
             });
         });
     </script>
