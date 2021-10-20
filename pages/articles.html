@@ -45,7 +45,6 @@
             // TODO: Add SDKs for Firebase products that you want to use
             // https://firebase.google.com/docs/web/setup#available-libraries
 
-
             // Initialize Firebase
             const app = firebase.initializeApp(firebaseConfig);
             const db = app.database()
@@ -53,13 +52,25 @@
             var articleListRef = db.ref('articles');
             articleListRef.once('value', (snapshot) => {
                 snapshot.forEach((childSnapshot) => {
-                    panel.append(applyTemplate(childSnapshot.val()));
+                    panel.append(applyTemplate(childSnapshot.key, childSnapshot.val()));
                 });
+            });
+
+            $(document).on("click",".row .like .button",function() {
+                console.log('like');
+                console.log($(this).closest('.row').data('key'));
+
+                var row = $(this).closest('.row');
+                var key = row.data('key');
+
+                articleListRef.child(key).set({
+                    count: parseInt(row.find('.count').text()) + 1
+                })
             });
         })
 
-        function applyTemplate(data) {
-            return `<div class="row">`
+        function applyTemplate(key, data) {
+            return `<div class="row" data-key="${key}">`
                 + `    <div class="card">`
                 + `        <div class="card-img-top">`
                 + `            <div class="thumbnail thumbnail-before"><img src="${data["thumbnail-before"]}"></div>`
