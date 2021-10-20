@@ -15,8 +15,139 @@
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
         crossorigin="anonymous"></script>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
     <script type="text/javascript"
         src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uxdaz0sqo9"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script type="text/javascript"
+        src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uxdaz0sqo9&submodules=geocoder"></script>
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <script>
+        var lat = 0;
+        var lng = 0;
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            if (navigator.geolocation) {
+                /**
+                * navigator.geolocation 은 Chrome 50 버젼 이후로 HTTP 환경에서 사용이 Deprecate 되어 HTTPS 환경에서만 사용 가능 합니다.
+                * http://localhost 에서는 사용이 가능하며, 테스트 목적으로, Chrome 의 바로가기를 만들어서 아래와 같이 설정하면 접속은 가능합니다.
+                * chrome.exe --unsafely-treat-insecure-origin-as-secure="http://example.com"
+                */
+                navigator.geolocation.getCurrentPosition(onSuccessGeolocation, onErrorGeolocation);
+            }
+        });
+
+        function onSuccessGeolocation(position) {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+
+            // https://navermaps.github.io/maps.js.ncp/docs/tutorial-Geocoder-Geocoding.html
+            naver.maps.Service.reverseGeocode({
+                coords: new naver.maps.LatLng(position.coords.latitude, position.coords.longitude),
+            }, function(status, response) {
+                if (status !== naver.maps.Service.Status.OK) {
+                    return alert('Something wrong!');
+                }
+
+                var result = response.v2, // 검색 결과의 컨테이너
+                    items = result.results, // 검색 결과의 배열
+                    address = result.address; // 검색 결과로 만든 주소
+
+                // do Something
+                if (address.jibunAddress && address.jibunAddress.length > 0) {
+                    $('.section-location .location').text(`${address.jibunAddress.substring(0, address.jibunAddress.lastIndexOf(' '))}`)
+                }
+            });
+        }
+
+        function onErrorGeolocation() {
+            console.log('onErrorGeolocation')
+        }
+
+        $().ready(function () {
+            $('.section-location .location').click(function () {
+                new daum.Postcode({
+                    oncomplete: function (data) {
+                        // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
+                        // 예제를 참고하여 다양한 활용법을 확인해 보세요.
+                        console.log(data);
+                        $('.section-location .location').text(`${data.jibunAddress.substring(0, data.jibunAddress.lastIndexOf(' '))}`)
+
+                        naver.maps.Service.geocode({
+                            query: data.jibunAddress
+                        }, function(status, response) {
+                            if (status !== naver.maps.Service.Status.OK) {
+                                return alert('Something wrong!');
+                            }
+
+                            var result = response.v2; // 검색 결과의 컨테이너
+                            var items = result.addresses; // 검색 결과의 배열
+
+                            if (items && items.length > 0) {
+                                var item = items[0];
+                                lat = item.x;
+                                lng = item.y;
+                            }
+                        });
+                    }
+                }).open();
+            })
+
+
+            // Your web app's Firebase configuration
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            const firebaseConfig = {
+                apiKey: "AIzaSyDKn58QyDMdcfy68EOMON38O_M5Z0N9-pU",
+                authDomain: "clean-together-2021.firebaseapp.com",
+                databaseURL: "https://clean-together-2021-default-rtdb.firebaseio.com",
+                projectId: "clean-together-2021",
+                storageBucket: "clean-together-2021.appspot.com",
+                messagingSenderId: "299538432144",
+                appId: "1:299538432144:web:23c34e489c71aeb8509815",
+                measurementId: "G-PJWLYC29GZ"
+            };
+
+            // Import the functions you need from the SDKs you need
+            // TODO: Add SDKs for Firebase products that you want to use
+            // https://firebase.google.com/docs/web/setup#available-libraries
+
+            // Initialize Firebase
+            const app = firebase.initializeApp(firebaseConfig);
+            const db = app.database()
+
+            $('#report-button').click(function () {
+                if(lat === 0) {
+                    alert('위치를 설정해주세요.')
+                    return;
+                }
+
+                var postListRef = db.ref('articles');
+                var newPostRef = postListRef.push();
+                newPostRef.set({
+                    "thumbnail-before": '',
+                    "thumbnail-after": '',
+                    content: $('#content').val(),
+                    address: $('.section-location .location').text(),
+                    lat: lat,
+                    lng: lng,
+                    createdAt: new Date().toISOString().slice(0, 10),
+                    like: 0,
+                    status: 1 // 접수
+                });
+
+                setTimeout(function () {
+                    location.href = "/"
+                }, 2000)
+            })
+        })
+    </script>
 </head>
 
 <body>
@@ -32,7 +163,7 @@
                 </div>
                 <div class="section section-content mb-3">
                     <!-- 메모 공간 -->
-                    <textarea class="form-control" rows="10" placeholder="게시글 내용을 작성해주세요."></textarea>
+                    <textarea id="content" class="form-control" rows="10" placeholder="게시글 내용을 작성해주세요."></textarea>
                 </div>
                 <div class="section section-location mb-3 pb-3">
                     <!-- 좌표 설정하는곳 -->
@@ -40,7 +171,7 @@
                     <div class="location d-inline-block">위치찾기</div>
                 </div>
                 <div class="section d-grid">
-                    <button class="btn btn-primary btn-block">등록</button>
+                    <button id="report-button" class="btn btn-primary btn-block">등록</button>
                 </div>
             </div>
         </div>
