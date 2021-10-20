@@ -122,10 +122,11 @@ body > .container {
     cursor: pointer;
     text-align: center;
     opacity: 0.6;
+    margin: 0 auto;
 }
 
 .upload-button img {
-    margin-top: 10px;
+    margin-top: 18px;
     width: 24px;
     opacity: 0.6;
 }

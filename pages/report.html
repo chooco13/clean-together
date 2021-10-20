@@ -23,6 +23,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
     <script type="text/javascript"
         src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=uxdaz0sqo9&submodules=geocoder"></script>
@@ -51,7 +52,7 @@
             // https://navermaps.github.io/maps.js.ncp/docs/tutorial-Geocoder-Geocoding.html
             naver.maps.Service.reverseGeocode({
                 coords: new naver.maps.LatLng(position.coords.latitude, position.coords.longitude),
-            }, function(status, response) {
+            }, function (status, response) {
                 if (status !== naver.maps.Service.Status.OK) {
                     return alert('Something wrong!');
                 }
@@ -72,6 +73,10 @@
         }
 
         $().ready(function () {
+            $('.upload-button').click(function () {
+                $('#file-input').click();
+            })
+
             $('.section-location .location').click(function () {
                 new daum.Postcode({
                     oncomplete: function (data) {
@@ -82,7 +87,7 @@
 
                         naver.maps.Service.geocode({
                             query: data.jibunAddress
-                        }, function(status, response) {
+                        }, function (status, response) {
                             if (status !== naver.maps.Service.Status.OK) {
                                 return alert('Something wrong!');
                             }
@@ -121,9 +126,10 @@
             // Initialize Firebase
             const app = firebase.initializeApp(firebaseConfig);
             const db = app.database()
+            const storage = app.storage()
 
             $('#report-button').click(function () {
-                if(lat === 0) {
+                if (lat === 0) {
                     alert('위치를 설정해주세요.')
                     return;
                 }
@@ -146,7 +152,27 @@
                     location.href = "/"
                 }, 2000)
             })
+
+            $('#file-input').change(function () {  
+                var file = $('#file-input')[0].files[0]; // use the Blob or File API
+                console.log(file);
+                console.log(uuidv4());
+                var newFilename = uuidv4() + '.jpg';
+
+                storageRef = storage.ref();
+                storageRef.child(newFilename).put(file).then(function(snapshot) {
+                    snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                        console.log(downloadURL);
+                    });
+                });
+            })
         })
+
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
     </script>
 </head>
 
@@ -158,8 +184,8 @@
                     <!-- 이미지 올리는 곳 -->
                     <div class="upload-button">
                         <img src="/images/add_a_photo_black_48dp.svg" class="black">
-                        <div class="count"><span>0</span>/10</div>
                     </div>
+                    <input class="d-none" type="file" id="file-input">
                 </div>
                 <div class="section section-content mb-3">
                     <!-- 메모 공간 -->
