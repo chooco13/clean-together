@@ -24,6 +24,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
+    <script src="/script/MarkerClustering.js"></script>
+
     <script>
         $().ready(function () {
 
@@ -86,6 +88,37 @@
     </div>
 
     <script>
+        const _likes = localStorage.getItem('likes');
+        const likes = _likes !== null ? JSON.parse(_likes) : [];
+
+        const markers = [];
+
+        var htmlMarker1 = {
+            content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-1.png);background-size:contain;"></div>',
+            size: N.Size(40, 40),
+            anchor: N.Point(20, 20)
+        },
+        htmlMarker2 = {
+            content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-1.png);background-size:contain;"></div>',
+            size: N.Size(40, 40),
+            anchor: N.Point(20, 20)
+        },
+        htmlMarker3 = {
+            content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-1.png);background-size:contain;"></div>',
+            size: N.Size(40, 40),
+            anchor: N.Point(20, 20)
+        },
+        htmlMarker4 = {
+            content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-1.png);background-size:contain;"></div>',
+            size: N.Size(40, 40),
+            anchor: N.Point(20, 20)
+        },
+        htmlMarker5 = {
+            content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-5.png);background-size:contain;"></div>',
+            size: N.Size(40, 40),
+            anchor: N.Point(20, 20)
+        };
+
         var mapOptions = {
             center: new naver.maps.LatLng(36.3504119, 127.3845475),
             zoom: 16
@@ -100,11 +133,6 @@
 
             map.setCenter(location); // 얻은 좌표를 지도의 중심으로 설정합니다.
             map.setZoom(16); // 지도의 줌 레벨을 변경합니다.
-
-            infowindow.setContent('<div style="padding:20px;">' + 'geolocation.getCurrentPosition() 위치' + '</div>');
-
-            infowindow.open(map, location);
-            console.log('Coordinates: ' + location.toString());
         }
 
         function onErrorGeolocation() {
@@ -117,6 +145,10 @@
         }
 
         window.addEventListener('DOMContentLoaded', (event) => {
+            var modal = new bootstrap.Modal(document.getElementById('modal'), {
+                keyboard: false
+            })
+
             if (navigator.geolocation) {
                 /**
                  * navigator.geolocation 은 Chrome 50 버젼 이후로 HTTP 환경에서 사용이 Deprecate 되어 HTTPS 환경에서만 사용 가능 합니다.
@@ -155,14 +187,114 @@
             articleListRef.once('value', (snapshot) => {
                 snapshot.forEach((childSnapshot) => {
                     var report = childSnapshot.val();
+
                     var marker = new naver.maps.Marker({
-                        position: new naver.maps.LatLng(report.lat, report.lng),
+                        position: new naver.maps.LatLng(parseFloat(report.lat), parseFloat(report.lng)),
                         map: map
-                    });
+                    })
+                    markers.push(marker);
+
+                    marker.addListener('click', function () {
+                        $('#modal .modal-body').html(applyTemplate(childSnapshot.key, childSnapshot.val()))
+                        modal.show()
+                    })
+                });
+
+                var markerClustering = new MarkerClustering({
+                    minClusterSize: 2,
+                    maxZoom: 16,
+                    map: map,
+                    markers: markers,
+                    disableClickZoom: false,
+                    gridSize: 120,
+                    icons: [htmlMarker1, htmlMarker2, htmlMarker3, htmlMarker4, htmlMarker5],
+                    indexGenerator: [10, 100, 200, 500, 1000],
+                    stylingFunction: function(clusterMarker, count) {
+                        $(clusterMarker.getElement()).find('div:first-child').text(count);
+                    }
                 });
             });
+
+            $(document).on("click", ".row .like .button", function () {
+                console.log('like');
+                console.log($(this).closest('.row').data('key'));
+
+                var row = $(this).closest('.row');
+                var key = row.data('key');
+
+                var current = parseInt(row.find('.count').text())
+                var next;
+                if (likes.includes(key)) {
+                    next = current - 1;
+                    row.find('.button').removeClass('active');
+                    likes.splice(likes.indexOf(key), 1);
+                } else {
+                    next = current + 1;
+                    row.find('.button').addClass('active');
+                    likes.push(key);
+                }
+                localStorage.setItem('likes', JSON.stringify(likes));
+
+                articleListRef.child(`${key}/like`).set(next)
+                row.find('.count').text(next);
+            });
         });
+
+        function applyTemplate(key, data) {
+            return `<div class="row" data-key="${key}">`
+                + `    <div class="card">`
+                + `        <div class="card-img-top">`
+                + `            <div class="thumbnail thumbnail-before"><img src="${data["thumbnail-before"]}"></div>`
+                + `            <div class="thumbnail thumbnail-after"><img src="${data["thumbnail-after"] === '' ? '../images/waiting.png' : data["thumbnail-after"]}"></div>`
+                + `        </div>`
+                + `        <div class="like py-2">`
+                + `            <div class="button${likes.includes(key) ? ' active' : ''}">`
+                + `                <img class="like" src="../images/favorite.svg">`
+                + `                <img class="none" src="../images/favorite_border.svg">`
+                + `                <span class="count">${data.like}</span>`
+                + `            </div>`
+                + `        </div>`
+                + `        <div class="content pb-2">${data.content}</div>`
+                + `        <div class="info pb-1">`
+                + `            <div class="status status${data.status}">${getStatusLabel(data.status)}</div>`
+                + `            <div class="address">${data.address}</div>`
+                + `            <div class="created-at">${data.createdAt}</div>`
+                + `        </div>`
+                + `    </div>`
+                + `</div>`
+        }
+
+        function getStatusLabel(status) {
+            var label = ''
+
+            switch (status) {
+                case 1:
+                    label = '접수';
+                    break;
+                case 2:
+                    label = '처리중';
+                    break;
+                case 3:
+                    label = '완료';
+                    break;
+            }
+
+            return label;
+        }
     </script>
+
+    <div id="modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="pills-articles" class="modal-body">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
