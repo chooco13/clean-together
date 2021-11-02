@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
 
 html, body {
     height: 100%;
@@ -281,12 +281,12 @@ body > .container {
     font-size: 13px;
     color: #a9a9a9;
 }
-
-.modal-content .modal-body,
-.modal-content .modal-body .card {
-    padding: 0;
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #38d56c !important;
 }
-
-.modal-content .modal-body .card {
-    border: 0;
+.btn-primary {
+    color: #fff;
+    background-color: #38d56c;
+    border-color: #38d56c;
 }
