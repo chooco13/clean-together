@@ -201,6 +201,9 @@
             <div class="tab-pane show active" id="pills-report" role="tabpanel" aria-labelledby="pills-report-tab">
                 <div class="section section-image mb-3">
                     <!-- 이미지 올리는 곳 -->
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#helpModal">
+                        <img src="/images/help.png" class="black">
+                    </button>                                              
                     <div class="upload-button">
                         <img src="/images/add_a_photo_black_48dp.svg" class="black">
                     </div>
@@ -235,7 +238,7 @@
             <li class="nav-item" role="presentation">
                 <a href="articles.html" class="nav-link" id="pills-articles-tab">
                     <img src="/images/article_black_48dp.svg" class="black">
-                    게시글
+                    현황
                 </a>
             </li>            
             <li class="nav-item" role="presentation">
@@ -252,6 +255,34 @@
             </li>
         </ul>
     </div>
+
+    
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">제보 도움말</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ol>
+                    <li>
+                        쓰레기 사진을 업로드 합니다.
+                    </li>
+                    <li>
+                        게시글을 작성합니다.
+                    </li>
+                    <li>
+                        위치가 다르다면 위치를 설정합니다.
+                    </li>
+                    <li>
+                        등록합니다.
+                    </li>
+                </ol>
+            </div>
+          </div>
+        </div>
+      </div>
 </body>
 
 </html>
